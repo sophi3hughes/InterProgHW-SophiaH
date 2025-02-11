@@ -8,12 +8,12 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class PopcornManager : MonoBehaviour
 {
     // references
     public GameObject popcornPrefab;
-    //public Transform spawnPoint;
     public Transform[] spawnPoints;
 
     // UI
@@ -21,6 +21,7 @@ public class PopcornManager : MonoBehaviour
     public TextMeshProUGUI timerText;
     public TextMeshProUGUI gameOverText;
     public GameObject feedbackTextPrefab;
+    public TextMeshProUGUI countersText;
     public Canvas mainCanvas;
 
     // game timer
@@ -34,6 +35,9 @@ public class PopcornManager : MonoBehaviour
     private float spawnTimer = 0f;
     private float currentSpawnInterval;
 
+    // popcorn speed
+    public float popcornSpeedMultiplier = 1f;
+
     // score
     private int score;
     public int Score
@@ -42,9 +46,20 @@ public class PopcornManager : MonoBehaviour
         set
         {
             score = Mathf.Max(value, 0);
-            if (scoreText) scoreText.text = "Score: " + score;
+            if (scoreText) scoreText.text = "Score:" + score;
         }
     }
+
+    // count for each popcorn type popped
+    public int kernelCount;
+    public int wellPoppedCount;
+    public int perfectCount;
+    public int burntCount;
+    public int rainbowCount;
+
+    // popcorn combo 
+    private int comboCount = 0;
+    private bool lastWasComboEligible = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -97,8 +112,14 @@ public class PopcornManager : MonoBehaviour
         gameOver = true;
         if (gameOverText)
         {
-            gameOverText.gameObject.SetActive(false);
-            gameOverText.text = "GAME OVER!\n Final Score: " + score;
+            gameOverText.gameObject.SetActive(true);
+            gameOverText.text = "GAME OVER!\n Final Score: " + score
+                + "\n\nCounters:\n"
+                + $"Kernel: {kernelCount}\n"
+                + $"Well: {wellPoppedCount}\n"
+                + $"Perfect: {perfectCount}\n"
+                + $"Burnt: {burntCount}\n"
+                + $"Rainbow: {rainbowCount}\n";
         }
     }
 
@@ -106,15 +127,24 @@ public class PopcornManager : MonoBehaviour
     {
         // random spawn point chosen from array spawnPoints[]
         if (spawnPoints == null || spawnPoints.Length == 0) Debug.Log("no spawn points found in array");
-        
+
         foreach (Transform sp in spawnPoints)
         {
             Vector3 pos = sp.position;
             pos.x += Random.Range(-0.25f, 0.25f);
             pos.z += Random.Range(-0.25f, 0.25f);
-            Instantiate(popcornPrefab, pos, Quaternion.identity);
-        }    
-        
+
+            GameObject newPop = Instantiate(popcornPrefab, pos, Quaternion.identity);
+
+            // rainbow rng
+            bool isRainbow = (Random.value < 0.05f); // 5% for rainbow popcorn
+            Popcorn popScript = newPop.GetComponent<Popcorn>();
+            // NEW TERNARY OPERATOR!
+            popScript.variant = isRainbow ? Popcorn.PopcornVariant.Rainbow : Popcorn.PopcornVariant.Normal;
+
+            //Instantiate(popcornPrefab, pos, Quaternion.identity);
+        }
+
         /*Transform chosenSpawn = spawnPoints[Random.Range(0, spawnPoints.Length)];
         
         // random offset around spawnpoint
@@ -148,5 +178,86 @@ public class PopcornManager : MonoBehaviour
 
             Destroy(textObj, 1f);
         }
+    }
+
+    // popcorn type count tracker
+    public void AddPopcornCount(Popcorn.PopcornStates state, Popcorn.PopcornVariant variant)
+    {
+        if (variant == Popcorn.PopcornVariant.Rainbow && state != Popcorn.PopcornStates.Burnt)
+        {
+            rainbowCount++;
+        }
+        else
+        {
+            switch (state)
+            {
+                case Popcorn.PopcornStates.Kernel:
+                    kernelCount++;
+                    break;
+                case Popcorn.PopcornStates.WellPopped:
+                    wellPoppedCount++;
+                    break;
+                case Popcorn.PopcornStates.PerfectlyPopped:
+                    perfectCount++;
+                    break;
+                case Popcorn.PopcornStates.Burnt:
+                    burntCount++;
+                    break;
+            }
+        }
+        UpdateCounters();
+    }
+    public void SlowPopcornStates(float duration)
+    {
+        StartCoroutine(SlowPopcornCoroutine(duration));
+    }
+    private IEnumerator SlowPopcornCoroutine(float duration)
+    {
+        popcornSpeedMultiplier = 0.5f; // half speed
+        yield return new WaitForSeconds(duration);
+        popcornSpeedMultiplier = 1f; // back to normal
+    }
+
+    // combos
+    public void CheckCombo(Popcorn.PopcornStates currentState, Popcorn.PopcornVariant variant, ref int scoreChange)
+    {
+        bool isEligible = false;
+
+        // if rainbow & not burnt, or if perfectly popped
+        if ((variant == Popcorn.PopcornVariant.Rainbow && currentState != Popcorn.PopcornStates.Burnt)
+            || currentState == Popcorn.PopcornStates.PerfectlyPopped)
+        {
+            isEligible = true;
+        }
+
+        if (isEligible && lastWasComboEligible)
+        {
+            comboCount++;
+            // +5 points
+            scoreChange += 5;
+        }
+        else if (isEligible)
+        {
+            // start a new combo
+            comboCount = 1;
+        }
+        else
+        {
+            comboCount = 0;
+        }
+
+        // tracking last popcorn type
+        lastWasComboEligible = isEligible;
+    }
+
+    public void UpdateCounters()
+    {
+        if (!countersText) return;
+        countersText.text = 
+            "Kernel: " + kernelCount + "\n" +
+            "Good: " + wellPoppedCount + "\n" +
+            "Perfect: " + perfectCount + "\n" +
+            "Burnt: " + burntCount + "\n" +
+            "Rainbow: " + rainbowCount + "\n";
     }
 }

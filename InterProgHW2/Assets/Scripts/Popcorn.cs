@@ -3,6 +3,7 @@
  * Switch statements x3
  * array for child components of popcorn prefab
  * prefabs made for popcorn and feedback text
+ * NEW: enum for normal or rainbow popcorn type
 */
 
 using Unity.VisualScripting;
@@ -16,11 +17,20 @@ public class Popcorn : MonoBehaviour
         Kernel,
         WellPopped,
         PerfectlyPopped,
-        Burnt
+        Burnt,
+        Rainbow
     }
 
-    // settings
+    public enum PopcornVariant
+    {
+        Normal,
+        Rainbow
+    }
+    
     public PopcornStates currentState = PopcornStates.Kernel;
+    public PopcornVariant variant = PopcornVariant.Normal;
+
+    // settings
     public float stateDuration = 0.5f;
     public float stateTimer = 0f;
     private bool hasBeenClicked = false;
@@ -30,6 +40,7 @@ public class Popcorn : MonoBehaviour
     public Material wellPopped;
     public Material perfectlyPopped;
     public Material burnt;
+    public Material rainbow;
 
     // child meshes
     public GameObject kernelModel;
@@ -43,9 +54,6 @@ public class Popcorn : MonoBehaviour
     {
         manager = Object.FindFirstObjectByType<PopcornManager>();
 
-        int randomIndex = Random.Range(0, 4);
-        currentState = (PopcornStates)randomIndex;
-
         Rigidbody rb = GetComponent<Rigidbody>();
         
         // randomize pop direction
@@ -55,6 +63,17 @@ public class Popcorn : MonoBehaviour
         // random spinning
         rb.AddTorque(Random.insideUnitSphere * 50f);
 
+        if (variant == PopcornVariant.Rainbow)
+        {
+            currentState = PopcornStates.Rainbow;
+            stateDuration = 1.5f;
+        }
+        else
+        {
+            int randomIndex = Random.Range(0, 4);
+            currentState = (PopcornStates)randomIndex;
+        }
+
         UpdatePopcorn();
     }
 
@@ -63,7 +82,9 @@ public class Popcorn : MonoBehaviour
     {
         if (!hasBeenClicked && currentState != PopcornStates.Burnt)
         {
-            stateTimer += Time.deltaTime;
+            float speedMult = (variant == PopcornVariant.Rainbow) ? 1f : manager.popcornSpeedMultiplier; // TERNARY OP
+
+            stateTimer += Time.deltaTime * speedMult;
             if (stateTimer >= stateDuration)
             {
                 MoveToNextState();
@@ -75,21 +96,27 @@ public class Popcorn : MonoBehaviour
     // SWITCH statement
     private void MoveToNextState()
     {
-        switch (currentState)
+        if(variant == PopcornVariant.Rainbow)
         {
-            case PopcornStates.Kernel:
-                currentState = PopcornStates.WellPopped; 
-                break;
-            case PopcornStates.WellPopped:
-                currentState = PopcornStates.PerfectlyPopped;
-                break;
-            case PopcornStates.PerfectlyPopped:
-                currentState = PopcornStates.Burnt;
-                break;
-            default:
-                break;
+            currentState = PopcornStates.Burnt;
         }
-
+        else
+        {
+            switch (currentState)
+            {
+                case PopcornStates.Kernel:
+                    currentState = PopcornStates.WellPopped;
+                    break;
+                case PopcornStates.WellPopped:
+                    currentState = PopcornStates.PerfectlyPopped;
+                    break;
+                case PopcornStates.PerfectlyPopped:
+                    currentState = PopcornStates.Burnt;
+                    break;
+                default:
+                    break;
+            }
+        }
         UpdatePopcorn();
     }
 
@@ -101,28 +128,39 @@ public class Popcorn : MonoBehaviour
 
         int scoreChange = 0;
         string feedback = "";
-
-        switch (currentState)
+        if (variant  == PopcornVariant.Rainbow && currentState != PopcornStates.Burnt)
         {
-            case PopcornStates.Kernel:
-                scoreChange = -5;
-                feedback = "Kernel! -5";
-                break;
-            case PopcornStates.WellPopped:
-                scoreChange = 5;
-                feedback = "Well Popped! +5";
-                break;
-            case PopcornStates.PerfectlyPopped:
-                scoreChange = 15;
-                feedback = "Perfectly Popped! +15";
-                break;
-            case PopcornStates.Burnt:
-                scoreChange = -10;
-                feedback = "Burnt! -10";
-                break;
-            default:
-                break;
+            scoreChange = 100;
+            feedback = "Rainbow! +100";
+            manager.SlowPopcornStates(7f);
         }
+        else
+        {
+            switch (currentState)
+            {
+                case PopcornStates.Kernel:
+                    scoreChange = -5;
+                    feedback = "Kernel! -5";
+                    break;
+                case PopcornStates.WellPopped:
+                    scoreChange = 5;
+                    feedback = "Good! +5";
+                    break;
+                case PopcornStates.PerfectlyPopped:
+                    scoreChange = 15;
+                    feedback = "Perfectly Popped! +15";
+                    break;
+                case PopcornStates.Burnt:
+                    scoreChange = -10;
+                    feedback = "Burnt! -10";
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        manager.CheckCombo(currentState, variant, ref scoreChange);
+        manager.AddPopcornCount(currentState, variant);
 
         manager.UpdateScore(scoreChange);
         manager.SpawnText(feedback, transform.position);
@@ -138,22 +176,30 @@ public class Popcorn : MonoBehaviour
         poppedModel.SetActive(!isKernel);
 
         Material mat = null;
-        switch (currentState)
+
+        if (variant == PopcornVariant.Rainbow && currentState != PopcornStates.Burnt)
         {
-            case PopcornStates.Kernel:
-                mat = kernel;
-                break;
-            case PopcornStates.WellPopped:
-                mat = wellPopped;
-                break;
-            case PopcornStates.PerfectlyPopped:
-                mat = perfectlyPopped;
-                break;
-            case PopcornStates.Burnt:
-                mat = burnt;
-                break;
-            default:
-                break;
+            mat = rainbow;
+        }
+        else
+        {
+            switch (currentState)
+            {
+                case PopcornStates.Kernel:
+                    mat = kernel;
+                    break;
+                case PopcornStates.WellPopped:
+                    mat = wellPopped;
+                    break;
+                case PopcornStates.PerfectlyPopped:
+                    mat = perfectlyPopped;
+                    break;
+                case PopcornStates.Burnt:
+                    mat = burnt;
+                    break;
+                default:
+                    break;
+            }
         }
 
         if (isKernel)

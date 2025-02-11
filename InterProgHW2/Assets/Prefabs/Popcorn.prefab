@@ -792,12 +792,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
+  variant: 0
   stateDuration: 0.5
   stateTimer: 0
   kernel: {fileID: 2100000, guid: 53602c322cf76a741ba8b12e7dddff89, type: 2}
   wellPopped: {fileID: 2100000, guid: bd61f682f26da794cb7d135dc0ebb317, type: 2}
   perfectlyPopped: {fileID: 2100000, guid: 72fcf024fa8603945bf7edaceed06ffb, type: 2}
   burnt: {fileID: 2100000, guid: e5025a2c57c4ad3458eeeea6e18ca28f, type: 2}
+  rainbow: {fileID: 2100000, guid: d22e07922d423504b92c2085d18deb34, type: 2}
   kernelModel: {fileID: 5518241523601236458}
   poppedModel: {fileID: 3682752584271651251}
   manager: {fileID: 0}
