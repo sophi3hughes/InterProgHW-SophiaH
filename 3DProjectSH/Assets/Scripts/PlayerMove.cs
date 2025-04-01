@@ -15,8 +15,8 @@ public class PlayerMove : MonoBehaviour
     private Vector3 defaultCameraLocalPos;
     private Quaternion defaultCameraLocalRot;
 
-    float gravityValue = -25;
-    float jumpHeight = 2f;
+    float gravityValue = -35;
+    float jumpHeight = 4f;
     float currentYVelocity;
 
     public float raycastRange = 5f;
