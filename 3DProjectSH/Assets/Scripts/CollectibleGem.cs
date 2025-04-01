@@ -4,7 +4,7 @@ using UnityEngine;
 public class CollectibleGem : MonoBehaviour
 {
     [Header("Collectible Settings")]
-    public AudioClip collectSound;   // assign in Inspector
+    public AudioClip collectSound;
     public int mysticEnergyValue = 5;
     public int collectibleCountValue = 1;
 
@@ -12,13 +12,13 @@ public class CollectibleGem : MonoBehaviour
 
     private void Start()
     {
-        // Ensure the gem’s collider is set as “isTrigger”
         Collider col = GetComponent<Collider>();
         col.isTrigger = true;
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        // do not add to count if its already collected
         if (isCollected) return;
 
         // check if player
