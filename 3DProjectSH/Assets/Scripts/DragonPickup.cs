@@ -1,3 +1,4 @@
+// script for dragon collider to pick up collectibles
 using UnityEngine;
 
 public class DragonPickup : MonoBehaviour

@@ -1,3 +1,9 @@
+/*
+ * For incrementing energy count, collectible count, playing sound, and destroying the gameobject
+ * - the gemstone collectibles are prefab
+ * 
+ */
+
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]

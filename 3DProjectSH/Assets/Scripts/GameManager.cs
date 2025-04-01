@@ -1,3 +1,8 @@
+/*
+ * Game manager that isn't really used
+ * - stores the global variables for collectible count and energy count
+ * - singleton
+ */
 using UnityEngine;
 
 public class GameManager : MonoBehaviour

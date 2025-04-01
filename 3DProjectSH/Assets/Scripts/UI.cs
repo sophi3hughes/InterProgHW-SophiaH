@@ -1,3 +1,4 @@
+// connects to UI elements
 using TMPro;
 using UnityEngine;
 

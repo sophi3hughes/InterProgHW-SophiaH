@@ -1,3 +1,10 @@
+/*
+ * Dragon flight script
+ * - Controls: mouse direction to go specific direction, w to go forwad, space to ascend, right click to speed boost, left shift dismount
+ * - added CAMERA effects while flying: fov zoom out when speed boosting(right click), slight camera bob while flying, camera tilt
+ * - animations: used different animations from the 3d model for landing, take off, flying, gliding, etc
+ */
+
 using UnityEngine;
 
 public class DragonFlightController : MonoBehaviour

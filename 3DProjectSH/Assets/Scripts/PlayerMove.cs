@@ -1,3 +1,9 @@
+/*
+ * For player movement. WASD, space for jump. F to interact. left shift to dismount dragon
+ * - using CharacterController
+ * - using raycasts to check distances
+ * - 
+ */
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;

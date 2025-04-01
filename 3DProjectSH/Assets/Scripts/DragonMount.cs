@@ -1,3 +1,9 @@
+/*
+ * used for mounting and dismounting the player
+ * 
+ * 
+ */
+
 using UnityEngine;
 
 public class DragonMount : MonoBehaviour
