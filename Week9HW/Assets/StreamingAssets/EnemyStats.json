@@ -1,0 +1,16 @@
+{
+  "enemies": [
+    {
+      "enemyName": "Slime",
+      "health": 10,
+      "attackPower": 3,
+      "speed": 1
+    },
+    {
+      "enemyName": "Enderman",
+      "health": 20,
+      "attackPower": 6,
+      "speed": 3
+    }
+  ]
+}
