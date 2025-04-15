@@ -19,7 +19,6 @@ public class EnemyStatsLoader : MonoBehaviour
         public float speed;
     }
 
-    // Reference your ScriptableObjects in the inspector
     public EnemyData[] enemyScriptableObjects;
 
     void Start()
@@ -29,21 +28,19 @@ public class EnemyStatsLoader : MonoBehaviour
 
     void LoadJsonAndApply()
     {
-        // If using StreamingAssets:
         string path = Path.Combine(Application.streamingAssetsPath, "EnemyStats.json");
         if (!File.Exists(path))
         {
-            Debug.LogWarning("No EnemyStats.json found at " + path);
+            Debug.LogWarning("No EnemyStats.json found");
             return;
         }
 
         string jsonString = File.ReadAllText(path);
         EnemyStatsJson allStats = JsonUtility.FromJson<EnemyStatsJson>(jsonString);
 
-        // Match each JSON entry to the corresponding ScriptableObject by name (or other logic)
+        // match json
         foreach (var jsonEnemy in allStats.enemies)
         {
-            // Find matching ScriptableObject
             foreach (var so in enemyScriptableObjects)
             {
                 if (so.enemyName == jsonEnemy.enemyName)
@@ -55,6 +52,6 @@ public class EnemyStatsLoader : MonoBehaviour
             }
         }
 
-        Debug.Log("Enemy stats updated from JSON!");
+        Debug.Log("json updated enemy stats");
     }
 }

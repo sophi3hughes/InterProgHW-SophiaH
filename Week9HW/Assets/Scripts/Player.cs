@@ -9,12 +9,12 @@ public class Player : MonoBehaviour
     public float gravity = 9.81f;
 
     [Header("Mouse Look Settings")]
-    public float mouseSensitivity = 200f;
-    public Transform cameraTransform; // Assign your camera here in the inspector
+    public float mouseSensitivity = 100f;
+    public Transform cameraTransform;
 
     [Header("Shooting")]
-    public GameObject bulletPrefab;   // Assign a bullet prefab here
-    public Transform bulletSpawnPoint; // A child Transform in front of the camera
+    public GameObject bulletPrefab;
+    public Transform bulletSpawnPoint;
 
     private CharacterController controller;
     private float verticalVelocity;
@@ -22,7 +22,6 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        // Lock and hide mouse cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -44,12 +43,10 @@ public class Player : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
-        // Rotate the camera up/down (pitch)
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
         cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
-        // Rotate player body left/right (yaw)
         transform.Rotate(Vector3.up * mouseX);
     }
 
@@ -61,10 +58,9 @@ public class Player : MonoBehaviour
         Vector3 move = transform.right * moveX + transform.forward * moveZ;
         move *= moveSpeed;
 
-        // Jump (simple version)
         if (controller.isGrounded)
         {
-            verticalVelocity = -0.5f; // small downward force to keep grounded
+            verticalVelocity = -0.5f;
             if (Input.GetButtonDown("Jump"))
             {
                 verticalVelocity = jumpForce;
@@ -72,7 +68,6 @@ public class Player : MonoBehaviour
         }
         else
         {
-            // Apply gravity
             verticalVelocity -= gravity * Time.deltaTime;
         }
 
@@ -85,7 +80,6 @@ public class Player : MonoBehaviour
         if (bulletPrefab && bulletSpawnPoint)
         {
             GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
-            // You can add velocity or a bullet script to move it
         }
     }
 }
