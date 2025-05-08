@@ -10,7 +10,7 @@ public class UI : MonoBehaviour
     {
         if (GameManager.instance != null)
         {
-            energyText.text = "Mystic Energy: " + GameManager.instance.mysticEnergy.ToString();
+            energyText.text = GameManager.instance.mysticEnergy.ToString();
         }
         else
         {

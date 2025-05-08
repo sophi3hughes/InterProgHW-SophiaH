@@ -68,7 +68,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 365964c7bea2747498dd7f96a516ec8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collectSound: {fileID: 8300000, guid: 9083525faa54f0b4c862c00a648e635e, type: 3}
+  collectSound: {fileID: 8300000, guid: fd4ac6cf6c2796e4995cff8f38e61e41, type: 3}
   mysticEnergyValue: 5
   collectibleCountValue: 1
 --- !u!1 &7819517121709867702

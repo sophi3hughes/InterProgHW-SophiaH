@@ -56,6 +56,9 @@ public class DragonFlightController : MonoBehaviour
     public bool hasRider = false;
     public float takeOffBoost = 2f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource wingAudio;
+
     void Start()
     {
         if (mainCam == null)
@@ -145,6 +148,19 @@ public class DragonFlightController : MonoBehaviour
         }
 
         HandleCameraFOV();
+
+        if (wingAudio != null)
+        {
+            bool shouldPlay = isFlying && isMoving;
+
+            if (shouldPlay && !wingAudio.isPlaying)
+                wingAudio.Play();
+            else if (!shouldPlay && wingAudio.isPlaying)
+                wingAudio.Stop();
+
+            wingAudio.pitch = isBoosting ? 1.25f : 1f;
+            wingAudio.volume = isBoosting ? 1.0f : 0.8f;
+        }
     }
 
     private void HandleCameraFOV()

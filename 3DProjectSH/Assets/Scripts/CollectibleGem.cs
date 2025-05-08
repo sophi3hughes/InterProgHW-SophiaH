@@ -28,7 +28,7 @@ public class CollectibleGem : MonoBehaviour
         if (isCollected) return;
 
         // check if player
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") || other.CompareTag("Dragon"))
         {
             isCollected = true;
 
@@ -38,7 +38,20 @@ public class CollectibleGem : MonoBehaviour
 
             if (collectSound != null)
             {
-                AudioSource.PlayClipAtPoint(collectSound, transform.position);
+                //AudioSource.PlayClipAtPoint(collectSound, Camera.main.transform.position, 5f);
+
+                GameObject tmp = new GameObject("GemPickupSFX");
+                tmp.transform.position = Camera.main.transform.position;
+
+                AudioSource src = tmp.AddComponent<AudioSource>();
+                src.clip = collectSound;
+                src.volume = 1f;
+                src.spatialBlend = 0f;
+                src.dopplerLevel = 0f;
+                src.Play();
+
+                Destroy(tmp, collectSound.length);
+
             }
             Destroy(gameObject);
         }
