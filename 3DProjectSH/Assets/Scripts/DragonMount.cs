@@ -40,7 +40,7 @@ public class DragonMount : MonoBehaviour
         {
             if (GameManager.instance.mysticEnergy < tamingCost)
             {
-                Debug.Log("Not enough energy to tame this dragon!");
+                Debug.Log("Not enough energy");
                 return false;
             }
             GameManager.instance.mysticEnergy -= tamingCost;

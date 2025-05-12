@@ -5,11 +5,11 @@ using TMPro;
 public class UIEnergyBar : MonoBehaviour
 {
     [Header("UI References")]
-    public Image energyFillImage;       // the foreground image, set to Filled/Horizontal
-    public TextMeshProUGUI energyLabel; // optional label
+    public Image energyFillImage;
+    public TextMeshProUGUI energyLabel;
 
     [Header("Game Settings")]
-    public int maxEnergy = 100;         // how many units full bar represents
+    public int maxEnergy = 100;
 
     void Update()
     {
@@ -22,7 +22,6 @@ public class UIEnergyBar : MonoBehaviour
 
         energyFillImage.fillAmount = cur / (float)maxEnergy;
 
-        // 2) optional text
         if (energyLabel)
             energyLabel.text = $"{cur}/{maxEnergy}";
     }

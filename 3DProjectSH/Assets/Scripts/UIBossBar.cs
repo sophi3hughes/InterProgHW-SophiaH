@@ -8,7 +8,7 @@ public class UIBossBar : MonoBehaviour
     [Header("UI refs")]
     public Slider slider;
     public CanvasGroup group;
-    public TextMeshProUGUI nameLabel;   // optional
+    public TextMeshProUGUI nameLabel; 
 
     void Awake()
     {

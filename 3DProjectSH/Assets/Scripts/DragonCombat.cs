@@ -6,26 +6,42 @@ using UnityEngine.UI;
 public class DragonCombat : MonoBehaviour
 {
     [Header("Refs")]
-    public Transform player;                // assign at runtime
-    public Animator anim;                   // roar / hit etc.
-    public NavMeshAgent agent;              // from DragonAI
-    public DragonAI patrol;                 // the existing patrol script
-    public DragonMount mount;               // to block mounting
+    public Transform player;
+    public Animator anim;
+    public NavMeshAgent agent;
+    public DragonAI patrol;
+    public DragonMount mount;
     public UIBossBar bossBar;
 
     [Header("Settings")]
     public float engageRadius = 25f;
     public int maxStamina = 7;
 
+    [Header("Attack settings")]
+    public float attackInterval = 9f;
+    public int damageEnergy = 5;
+    public string[] attackTriggers = { "Bite", "Claw", "Flame" };
+
+    public float attackRange = 4f;
+    public float approachSlack = 0.3f;
+    public float attackFreeze = 3f;
+
     int currentStamina;
-    bool inCombat = false;
+    bool inCombat;
+    float attackTimer;
+    float freezeTimer;
+    PlayerShield playerShield;
 
     void Start()
     {
-        currentStamina = maxStamina;
-
         if (player == null)
             player = GameObject.FindGameObjectWithTag("Player").transform;
+
+        playerShield = player.GetComponent<PlayerShield>();
+        currentStamina = maxStamina;
+        attackTimer = attackInterval;
+
+        agent.stoppingDistance = attackRange - approachSlack;
     }
 
     void Update()
@@ -36,13 +52,52 @@ public class DragonCombat : MonoBehaviour
 
         if (!inCombat && dist < engageRadius)
             EnterCombat();
-        else if (inCombat && dist > engageRadius * 1.5f)   // hysteresis
+        else if (inCombat && dist > engageRadius * 1.5f)
             ExitCombat();
 
-        if (inCombat)
+        if (!inCombat) return;
+
+        freezeTimer -= Time.deltaTime;
+
+        if (freezeTimer <= 0f)
         {
-            // face & walk at player (simple placeholder)
-            agent.SetDestination(player.position);
+            if (dist > attackRange)
+            {
+                agent.isStopped = false;
+                agent.SetDestination(player.position);
+            }
+            else
+            {
+                if (!agent.isStopped)
+                    agent.ResetPath();
+
+                agent.isStopped = true;
+                transform.LookAt(player);
+            }
+        }
+        else
+        {
+            if (!agent.isStopped)
+                agent.ResetPath();
+
+            agent.isStopped = true;
+        }
+
+        attackTimer -= Time.deltaTime;
+        if (attackTimer <= 0f)
+        {
+            attackTimer = attackInterval;
+            freezeTimer = attackFreeze;
+
+            string trig = attackTriggers[Random.Range(0, attackTriggers.Length)];
+            anim.SetTrigger(trig);                             // play animation
+
+            if (dist <= attackRange &&
+                (playerShield == null || !playerShield.IsShielding))
+            {
+                GameManager.instance.mysticEnergy =
+                    Mathf.Max(0, GameManager.instance.mysticEnergy - damageEnergy);
+            }
         }
     }
 
@@ -53,6 +108,8 @@ public class DragonCombat : MonoBehaviour
         agent.isStopped = false;
 
         bossBar.Show(name, maxStamina);
+        bossBar.UpdateValue(currentStamina);
+
         anim.SetTrigger("Roar");
     }
 
@@ -63,13 +120,15 @@ public class DragonCombat : MonoBehaviour
         agent.ResetPath();
 
         bossBar.Hide();
-    }
 
+        attackTimer = attackInterval;
+        freezeTimer = 0f;
+    }
     public void TakeHit(int dmg = 1)
     {
         currentStamina = Mathf.Max(0, currentStamina - dmg);
         bossBar.UpdateValue(currentStamina);
-        anim.SetTrigger("Hit");  
+        anim.SetTrigger("Hit");
 
         if (currentStamina == 0)
             Defeated();
@@ -90,9 +149,6 @@ public class DragonCombat : MonoBehaviour
     public bool IsInCombat => inCombat;
     public bool IsDefeated => currentStamina == 0;
 
-    [ContextMenu("Test TakeHit (lose 1 stamina)")]
-    private void DebugTakeHit()
-    {
-        TakeHit(1);
-    }
+    [ContextMenu("Debug - TakeHit")]
+    void DebugTakeHit() => TakeHit(1);
 }

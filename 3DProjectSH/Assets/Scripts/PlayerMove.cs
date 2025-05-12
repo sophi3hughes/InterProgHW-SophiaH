@@ -34,6 +34,8 @@ public class PlayerMove : MonoBehaviour
 
     int groundLayer = 1 << 6;
 
+    public SpellSigils spellSigils;
+
     void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -55,6 +57,12 @@ public class PlayerMove : MonoBehaviour
             HandleCamera();
             HandleMovement();
             HandleInteraction();
+
+            // spell
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                spellSigils.BeginSpell();
+            }
         }
         else
         {

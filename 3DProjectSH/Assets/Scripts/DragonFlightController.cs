@@ -278,7 +278,6 @@ public class DragonFlightController : MonoBehaviour
             mainCam.fieldOfView = normalFov;
         }
     }
-
     private void ForceIdleAnimator()
     {
         dragonAnimator.SetBool("IsGrounded", true);

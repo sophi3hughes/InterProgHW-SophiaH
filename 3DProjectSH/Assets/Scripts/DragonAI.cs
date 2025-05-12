@@ -48,7 +48,6 @@ public class DragonAI : MonoBehaviour
             _agent.SetDestination(waypoints[_current].position);
         }
 
-        // drive your walk animation by agent.velocity.magnitude
         float rawSpeed = _agent.velocity.magnitude;
         float normalized = rawSpeed / _agent.speed;
         //_anim.SetFloat("Speed", _agent.velocity.magnitude);
