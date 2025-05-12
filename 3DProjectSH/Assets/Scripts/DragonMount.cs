@@ -14,7 +14,8 @@ public class DragonMount : MonoBehaviour
     public NavMeshAgent agent;
 
     public int tamingCost = 10;
-    private bool hasBeenTamed = false;
+    [SerializeField] private bool hasBeenTamed = false;
+    public bool HasBeenTamed => hasBeenTamed;
 
     public bool isMounted = false;
 
@@ -26,11 +27,16 @@ public class DragonMount : MonoBehaviour
         if (agent != null) agent.enabled = true;
     }
 
+    public void MarkTamed()
+    {
+        hasBeenTamed = true;
+    }
+
     public bool MountPlayer(Transform playerTransform)
     {
-        if (isMounted) return false;
+        if (isMounted || !hasBeenTamed) return false;
 
-        if (!hasBeenTamed)
+        if (!HasBeenTamed)
         {
             if (GameManager.instance.mysticEnergy < tamingCost)
             {
