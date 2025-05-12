@@ -5,22 +5,45 @@
  */
 
 using UnityEngine;
+using UnityEngine.AI;
 
 public class DragonMount : MonoBehaviour
 {
     public Transform seatTransform;
     public DragonFlightController flightController;
+    public NavMeshAgent agent;
 
-    private bool isMounted = false;
+    public int tamingCost = 10;
+    private bool hasBeenTamed = false;
+
+    public bool isMounted = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         flightController.enabled = false;
+
+        if (agent != null) agent.enabled = true;
     }
-    public void MountPlayer(Transform playerTransform)
+
+    public bool MountPlayer(Transform playerTransform)
     {
-        if (isMounted) return;
+        if (isMounted) return false;
+
+        if (!hasBeenTamed)
+        {
+            if (GameManager.instance.mysticEnergy < tamingCost)
+            {
+                Debug.Log("Not enough energy to tame this dragon!");
+                return false;
+            }
+            GameManager.instance.mysticEnergy -= tamingCost;
+            hasBeenTamed = true;
+        }
+
+        isMounted = true;
+
+        if (agent != null) agent.enabled = false;
 
         flightController.enabled = true;
         flightController.OnMount();
@@ -32,27 +55,25 @@ public class DragonMount : MonoBehaviour
         
         playerTransform.localEulerAngles = new Vector3(-35f, 0f, 0f); // tilt down for dragon view
 
-        isMounted = true;
+        return true;
     }
 
     public void DismountPlayer(Transform playerTransform, Transform originalParent)
     {
         if (!isMounted) return;
+        isMounted = false;
 
         flightController.OnDismount();
+        flightController.enabled = false;
+
+        if (agent != null) agent.enabled = true;
 
         playerTransform.SetParent(originalParent);
         playerTransform.localPosition = Vector3.zero;
         playerTransform.localEulerAngles = Vector3.zero;
 
-        flightController.enabled = false;
+        //flightController.enabled = false;
 
-        isMounted = false;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        //isMounted = false;
     }
 }

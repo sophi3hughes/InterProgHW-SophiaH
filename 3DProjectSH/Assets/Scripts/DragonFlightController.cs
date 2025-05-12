@@ -80,7 +80,7 @@ public class DragonFlightController : MonoBehaviour
             isGrounded = true;
             velocity = Vector3.zero;
             transform.localEulerAngles = new Vector3(0f, transform.localEulerAngles.y, 0f);
-            ForceIdleAnimator();
+            //ForceIdleAnimator();
             return;
         }
 
@@ -271,7 +271,7 @@ public class DragonFlightController : MonoBehaviour
         hasRider = false;
         velocity = Vector3.zero;
         transform.localEulerAngles = new Vector3(0f, transform.localEulerAngles.y, 0f);
-        ForceIdleAnimator();
+        //ForceIdleAnimator();
 
         if (mainCam != null)
         {

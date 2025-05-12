@@ -186,12 +186,18 @@ public class PlayerMove : MonoBehaviour
         cameraPitch = 0f;
         cameraTrans.localEulerAngles = Vector3.zero;
 
-        characterController.enabled = false;
+        if (dragonMount.MountPlayer(transform))
+        {
+            characterController.enabled = false;
+            currentDragonMount = dragonMount;
+            isRidingDragon = true;
+        }
+        /*characterController.enabled = false;
         //this.enabled = false;
         dragonMount.MountPlayer(transform);
 
         currentDragonMount = dragonMount;
-        isRidingDragon = true;
+        isRidingDragon = true;*/
         //dragonMount.flightController.OnMount();
     }
 
